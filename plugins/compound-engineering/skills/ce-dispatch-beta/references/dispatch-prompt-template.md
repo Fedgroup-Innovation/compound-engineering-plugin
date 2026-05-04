@@ -13,7 +13,7 @@ Render exactly these sections, in this order. Keep the XML tags so downstream to
 [One paragraph orienting the in-workspace agent:
 - Plan file path (repo-relative) the unit was extracted from
 - One-sentence project context (read from plan frontmatter / repo README if available)
-- Note that this issue was created by ce-dispatch and corresponds to a single
+- Note that this issue was created by ce-dispatch-beta and corresponds to a single
   implementation unit (or a small batch of independent units) from the plan.
 The agent should `Read` the plan file for the full picture before starting.]
 </context>
@@ -28,8 +28,12 @@ issues -- otherwise prefer one issue per unit.]
 </task>
 
 <files>
-[Combined file list from the unit(s) -- files to create, modify, or read.
-Use the plan's `Files:` section as the source of truth. Repo-relative paths only.]
+[Combined file list from the unit(s) -- files to Create, Modify, or Test.
+Use the plan's `**Files:**` section as the source of truth (canonical sub-bullets:
+`Create:`, `Modify:`, `Test:` -- per the ce-plan unit template). `Read:` is also
+accepted as an alias when the plan was hand-edited or produced outside ce-plan.
+Repo-relative paths only. Do not silently drop `Test:` paths -- they are the
+test files the agent is expected to author or update, not just reference.]
 </files>
 
 <patterns>
@@ -118,7 +122,7 @@ without it.
 
 <output-contract>
 Report the result via the **PR description**, not via a JSON file or scratch
-artifact -- ce-dispatch reads the PR body to drive Phase 4 monitoring,
+artifact -- ce-dispatch-beta reads the PR body to drive Phase 4 monitoring,
 review, and merge gating.
 
 Render this section verbatim under a top-level `## Dispatch Result` heading
@@ -151,10 +155,10 @@ If verification was not possible, say why.
 
 ## Metadata footer
 
-Append the following HTML comment **outside** the `<output-contract>` block, at the very end of the rendered issue body. The comment is invisible in the GitHub UI but parseable by `ce-dispatch` on subsequent runs (and other tooling that wants to round-trip dispatch state).
+Append the following HTML comment **outside** the `<output-contract>` block, at the very end of the rendered issue body. The comment is invisible in the GitHub UI but parseable by `ce-dispatch-beta` on subsequent runs (and other tooling that wants to round-trip dispatch state).
 
 ```html
-<!-- ce-dispatch-metadata
+<!-- ce-dispatch-beta-metadata
 plan: <repo-relative plan path>
 unit_ids: <comma-separated U-IDs in this dispatch, e.g. U3 or U3,U5>
 dependencies: <comma-separated U-IDs this dispatch depends on, or "none">
@@ -168,7 +172,7 @@ dispatched_at: <ISO 8601 UTC timestamp>
 ## What the orchestrator does NOT include in the prompt
 
 - **Scratch directory paths**: the in-workspace agent has its own filesystem; do not reference paths from the orchestrator's machine.
-- **Codex CLI invocation flags or `--output-schema` artifacts**: `ce-dispatch` does not delegate to `codex exec` directly; the in-workspace agent runs whatever harness Conductor (or another platform) provides.
+- **Codex CLI invocation flags or `--output-schema` artifacts**: `ce-dispatch-beta` does not delegate to `codex exec` directly; the in-workspace agent runs whatever harness Conductor (or another platform) provides.
 - **Orchestrator-private state**: dependency graphs, parallel-safety analysis, or the dispatch order. The in-workspace agent only needs its own unit context.
 
 ## Token budget guidance
