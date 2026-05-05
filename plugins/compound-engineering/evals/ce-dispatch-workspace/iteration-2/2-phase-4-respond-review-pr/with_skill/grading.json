@@ -1,0 +1,57 @@
+{
+  "expectations": [
+    {
+      "text": "The output names exactly four options in the Phase 4 respond menu, including 'Reply to agent comment', 'Review the PR', 'Mark unit complete', and 'Done for now' \u2014 not six options, no 'Show dependency graph', no 'Dispatch newly unblocked units'.",
+      "passed": true,
+      "evidence": "Step 2 lists exactly: '1. Reply to agent comment / 2. Review the PR / 3. Mark unit complete / 4. Done for now' with no extra options."
+    },
+    {
+      "text": "When executing the 'Review the PR' branch, the output uses `gh pr view <number>` (or `--json`) to pull PR state. If the agent inspects the diff itself rather than delegating to `/ce-code-review`, it must also run `gh pr diff <number>`; if it delegates to `/ce-code-review`, that sub-skill is expected to handle diff fetching and a direct `gh pr diff` invocation is optional.",
+      "passed": true,
+      "evidence": "'gh pr view 142 --json number,url,state,merged,...' is used, and review is delegated to ce-code-review skill ('I invoke the `ce-code-review` skill ... ce-code-review owns the review itself'), making gh pr diff optional."
+    },
+    {
+      "text": "Any `gh pr list` invocation in the respond loop includes the `--state all` flag (otherwise merged PRs become invisible to the loop).",
+      "passed": true,
+      "evidence": "No `gh pr list` is invoked in the loop; only `gh pr view 142` is used (with a comment noting '--state all in case it was already merged'). Vacuously satisfied."
+    },
+    {
+      "text": "The output routes review work through the existing `/ce-code-review` skill (via the platform's skill-invocation primitive) OR captures user-typed feedback and posts it via `gh pr review` \u2014 it does NOT inline a fresh code-review prompt or invent a new review framework.",
+      "passed": true,
+      "evidence": "'I invoke the `ce-code-review` skill via the platform's skill-invocation primitive (`Skill` in Claude Code)' and 'gh pr review 142 --comment --body-file' for typed feedback."
+    },
+    {
+      "text": "The output does NOT mention any auto-review / `dispatch_auto_review` config, dependency-aware merge gating, or auto re-dispatch of newly unblocked units.",
+      "passed": true,
+      "evidence": "No mention of dispatch_auto_review, dependency graph, merge gating, or auto re-dispatch found anywhere in the output."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "eval_feedback": {
+    "suggestions": [
+      "Expectation [2] is vacuously satisfied because the agent didn't need to run `gh pr list` at all (PR number was given). Consider rewording to 'If `gh pr list` is invoked...' or construct a scenario that forces a list call."
+    ],
+    "overall": "Expectations are clear and well-targeted at the common failure modes; the output cleanly satisfied all of them."
+  },
+  "execution_metrics": {
+    "tool_calls": {},
+    "total_tool_calls": 0,
+    "total_steps": 1,
+    "files_created": [
+      "outputs/output.md"
+    ],
+    "errors_encountered": 0,
+    "output_chars": 5024,
+    "transcript_chars": 33351
+  },
+  "timing": {
+    "executor_duration_seconds": 27.09,
+    "grader_duration_seconds": 12.82,
+    "total_duration_seconds": 39.91
+  }
+}

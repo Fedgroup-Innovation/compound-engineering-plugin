@@ -1,0 +1,14 @@
+{
+  "eval_id": 3,
+  "eval_name": "phase-4-respond-reply-to-agent-comment",
+  "prompt": "I'm the orchestrator. I just got pinged that the agent in workspace /Users/ryan/conductor/workspaces/api-gateway/jackson posted a comment on the dispatched issue (issue #87, unit U2 of the rate-limit plan) asking whether we should use Redis Cluster mode or standalone Redis for the rate-limiter backend. The decision is standalone (we already have a standalone Redis in this stack and don't want to introduce cluster mode). Help me reply via the dispatch respond loop. Include the exact `gh` command you would run.",
+  "expected_output": "The agent enters Phase 4 respond loop, picks 'Reply to agent comment', surfaces the latest agent comment via `gh issue view 87 --comments` (or equivalent), captures the orchestrator's reply, and posts the reply via `gh issue comment 87 --body` with a body that begins with `[orchestrator -> jackson] <ISO 8601 UTC timestamp>` \u2014 matching the comment-protocol format the agent expects.",
+  "files": [],
+  "expectations": [
+    "The output uses `gh issue view 87 --comments` (or `gh api` equivalent) to pull the issue comment thread before composing a reply.",
+    "The output's reply body starts with the literal pattern `[orchestrator -> jackson]` followed by an ISO 8601 UTC timestamp (e.g., `2026-05-04T12:34:00Z`) \u2014 matching the comment-protocol section in the dispatched prompt template.",
+    "The output uses `gh issue comment 87` (with `--body` or `--body-file`) to post the reply, NOT `gh pr comment` (the issue is the surface, not the PR).",
+    "The reply body explicitly states the decision (use standalone Redis) and a brief rationale (already in stack, no cluster), reflecting the orchestrator's input \u2014 it does NOT just paraphrase the agent's question without answering.",
+    "The output does NOT modify the issue body itself or the metadata footer; comments are append-only per the protocol."
+  ]
+}

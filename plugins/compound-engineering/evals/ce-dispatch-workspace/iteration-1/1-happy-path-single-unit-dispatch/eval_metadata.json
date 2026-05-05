@@ -1,0 +1,20 @@
+{
+  "eval_id": 1,
+  "eval_name": "happy-path-single-unit-dispatch",
+  "prompt": "I have a multi-unit plan at evals/files/sample-multi-unit-plan.md and I want to dispatch ONLY unit U2 to a Conductor workspace. The workspace I just created is at /Users/ryan/conductor/workspaces/api-gateway/jackson. Render the GitHub issue body you would create (do not actually create the issue), including all template sections, and tell me the final `gh issue create` command you would run. Use the dispatch defaults: branch prefix `dispatch/`, base branch `main`, labels `ce-dispatch`.",
+  "expected_output": "A complete dispatch issue body (rendered from the dispatch-prompt-template), populated for unit U2 of the rate-limit plan. Includes <orientation>, <agent-identity>, <task>, <files>, <patterns>, <approach>, <constraints>, <testing>, <verify>, <output-contract>, <comment-protocol>, <ce-plugin>, plus the metadata footer with `unit_id: U2`, `agent_name: jackson`, `worktree_path: /Users/ryan/conductor/workspaces/api-gateway/jackson`. Plus the literal `gh issue create` command line.",
+  "files": [
+    "evals/files/sample-multi-unit-plan.md"
+  ],
+  "expectations": [
+    "The output renders a complete <orientation> section listing repo-relative orientation files (README/AGENTS.md/plan path/architecture doc/pattern files) \u2014 not inlined content, just paths.",
+    "The output renders an <agent-identity> section with `agent-name: jackson` (the dirname of the worktree path) and `worktree-path: /Users/ryan/conductor/workspaces/api-gateway/jackson`.",
+    "The output renders a <comment-protocol> section that includes the literal prefix shape `[<agent-name> -> orchestrator]` and an explicit STOP-and-wait directive after asking a clarification.",
+    "The output renders a <ce-plugin> block whose body is a numbered nine-step compound-engineering loop in this order: read orientation -> /ce-work -> implement -> /ce-code-review -> /ce-compound (optional) -> /ce-commit-push-pr -> comment with PR URL -> stop and wait -> /ce-resolve-pr-feedback on ping.",
+    "The output's <task>, <files>, <patterns>, <approach>, <constraints>, <testing>, and <verify> sections are populated from U2 of the supplied plan (token-bucket middleware on /api/v1/messages), NOT from U1 (token-bucket primitive) or U3 (per-tenant override).",
+    "The metadata footer (HTML comment) uses `unit_id: U2` (singular), NOT `unit_ids:` (plural), and includes `agent_name: jackson`, `worktree_path: /Users/ryan/conductor/workspaces/api-gateway/jackson`, and either `dependencies: U1` or no `dependencies:` line at all (the MVP drops the field but listing this unit's stated dependency is acceptable in prose).",
+    "The output proposes exactly ONE `gh issue create` invocation, not multiple. The command must include `--label ce-dispatch` and a body file or heredoc carrying the rendered prompt \u2014 not a partial body or a JSON dump.",
+    "The output does NOT contain a dependency-graph rendering, a parallel-safety check, a six-option monitor menu, or any reference to `dispatch_mode` / `dispatch_auto_review` (these were removed in the single-unit sync MVP).",
+    "The output does NOT actually invoke `gh issue create` (since the user asked for a dry-run rendering); the agent surfaces the command but defers execution."
+  ]
+}
