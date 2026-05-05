@@ -1,0 +1,466 @@
+{
+  "metadata": {
+    "skill_name": "ce-dispatch",
+    "skill_path": "/home/ubuntu/repos/compound-engineering-plugin/plugins/compound-engineering/skills/ce-dispatch",
+    "executor_model": "anthropic/claude-opus-4.7",
+    "analyzer_model": "anthropic/claude-opus-4.7",
+    "timestamp": "2026-05-05T10:07:17Z",
+    "evals_run": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "1-happy-path-single-unit-dispatch",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 9,
+        "failed": 0,
+        "total": 9,
+        "time_seconds": 69.05,
+        "tokens": 20111,
+        "tool_calls": 0,
+        "errors": 0,
+        "cost_usd": 0.21076605
+      },
+      "expectations": [
+        {
+          "text": "The output renders a complete <orientation> section listing repo-relative orientation files (README/AGENTS.md/plan path/architecture doc/pattern files) \u2014 not inlined content, just paths.",
+          "passed": true,
+          "evidence": "<orientation> section lists README.md, AGENTS.md, CLAUDE.md, docs/architecture.md, services/api-gateway/src/middleware/auth.ts, token_bucket.ts, etc. as paths."
+        },
+        {
+          "text": "The output renders an <agent-identity> section with `agent-name: jackson` (the dirname of the worktree path) and `worktree-path: /Users/ryan/conductor/workspaces/api-gateway/jackson`.",
+          "passed": true,
+          "evidence": "<agent-identity>\\n- agent-name: `jackson`\\n- worktree-path: `/Users/ryan/conductor/workspaces/api-gateway/jackson`"
+        },
+        {
+          "text": "The output renders a <comment-protocol> section that includes the literal prefix shape `[<agent-name> -> orchestrator]` and an explicit STOP-and-wait directive after asking a clarification.",
+          "passed": true,
+          "evidence": "`**[jackson -> orchestrator] <ISO 8601 UTC timestamp>**` and 'STOP. Do not proceed past the open question. Do not start related work. Wait for an...'"
+        },
+        {
+          "text": "The output renders a <ce-plugin> block whose body is a numbered nine-step compound-engineering loop in this order: read orientation -> /ce-work -> implement -> /ce-code-review -> /ce-compound (optional) -> /ce-commit-push-pr -> comment with PR URL -> stop and wait -> /ce-resolve-pr-feedback on ping.",
+          "passed": true,
+          "evidence": "Nine numbered steps: 1. Read orientation, 2. /ce-work, 3. Implement, 4. /ce-code-review, 5. /ce-compound, 6. /ce-commit-push-pr, 7. Append comment with PR URL, 8. Stop and wait, 9. On ping /ce-resolve-pr-feedback."
+        },
+        {
+          "text": "The output's <task>, <files>, <patterns>, <approach>, <constraints>, <testing>, and <verify> sections are populated from U2 of the supplied plan (token-bucket middleware on /api/v1/messages), NOT from U1 (token-bucket primitive) or U3 (per-tenant override).",
+          "passed": true,
+          "evidence": "<task>: 'Add a `rateLimitMiddleware` that calls `TokenBucket.consume(1)` keyed on the JWT subject claim...'; constraints warn against starting U3's per-tenant override."
+        },
+        {
+          "text": "The metadata footer (HTML comment) uses `unit_id: U2` (singular), NOT `unit_ids:` (plural), and includes `agent_name: jackson`, `worktree_path: /Users/ryan/conductor/workspaces/api-gateway/jackson`, and either `dependencies: U1` or no `dependencies:` line at all (the MVP drops the field but listing this unit's stated dependency is acceptable in prose).",
+          "passed": true,
+          "evidence": "Metadata: 'unit_id: U2\\nagent_name: jackson\\nworktree_path: /Users/ryan/conductor/workspaces/api-gateway/jackson' with no dependencies line."
+        },
+        {
+          "text": "The output proposes exactly ONE `gh issue create` invocation, not multiple. The command must include `--label ce-dispatch` and a body file or heredoc carrying the rendered prompt \u2014 not a partial body or a JSON dump.",
+          "passed": true,
+          "evidence": "Single `gh issue create --title ... --body-file \"$SCRATCH/issue-body.md\" --label ce-dispatch`"
+        },
+        {
+          "text": "The output does NOT contain a dependency-graph rendering, a parallel-safety check, a six-option monitor menu, or any reference to `dispatch_mode` / `dispatch_auto_review` (these were removed in the single-unit sync MVP).",
+          "passed": true,
+          "evidence": "No mention of dependency graph, parallel-safety, six-option monitor menu, or dispatch_mode/dispatch_auto_review fields."
+        },
+        {
+          "text": "The output does NOT actually invoke `gh issue create` (since the user asked for a dry-run rendering); the agent surfaces the command but defers execution.",
+          "passed": true,
+          "evidence": "'The `gh issue create` command I would run' and 'A few things I'd flag to you before actually running the command' \u2014 command shown, not executed."
+        }
+      ],
+      "notes": "Eval is well-scoped and the expectations map cleanly to observable artifacts in the rendered output."
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "1-happy-path-single-unit-dispatch",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4444,
+        "passed": 4,
+        "failed": 5,
+        "total": 9,
+        "time_seconds": 21.05,
+        "tokens": 4406,
+        "tool_calls": 0,
+        "errors": 0,
+        "cost_usd": 0.0558657
+      },
+      "expectations": [
+        {
+          "text": "The output renders a complete <orientation> section listing repo-relative orientation files (README/AGENTS.md/plan path/architecture doc/pattern files) \u2014 not inlined content, just paths.",
+          "passed": false,
+          "evidence": "No <orientation> section/tag exists in the output. The output is structured as a markdown issue body with sections like Context, Scope, Files, Patterns to Follow \u2014 but no explicit orientation block listing README/AGENTS.md/plan path/architecture docs."
+        },
+        {
+          "text": "The output renders an <agent-identity> section with `agent-name: jackson` (the dirname of the worktree path) and `worktree-path: /Users/ryan/conductor/workspaces/api-gateway/jackson`.",
+          "passed": false,
+          "evidence": "No <agent-identity> tag. The workspace path appears ('Workspace: /Users/ryan/conductor/workspaces/api-gateway/jackson') but there's no agent-name: jackson identity block."
+        },
+        {
+          "text": "The output renders a <comment-protocol> section that includes the literal prefix shape `[<agent-name> -> orchestrator]` and an explicit STOP-and-wait directive after asking a clarification.",
+          "passed": false,
+          "evidence": "No <comment-protocol> section or '[<agent-name> -> orchestrator]' prefix appears anywhere in the output."
+        },
+        {
+          "text": "The output renders a <ce-plugin> block whose body is a numbered nine-step compound-engineering loop in this order: read orientation -> /ce-work -> implement -> /ce-code-review -> /ce-compound (optional) -> /ce-commit-push-pr -> comment with PR URL -> stop and wait -> /ce-resolve-pr-feedback on ping.",
+          "passed": false,
+          "evidence": "No <ce-plugin> block or any reference to /ce-work, /ce-code-review, /ce-compound, /ce-commit-push-pr, or /ce-resolve-pr-feedback commands."
+        },
+        {
+          "text": "The output's <task>, <files>, <patterns>, <approach>, <constraints>, <testing>, and <verify> sections are populated from U2 of the supplied plan (token-bucket middleware on /api/v1/messages), NOT from U1 (token-bucket primitive) or U3 (per-tenant override).",
+          "passed": true,
+          "evidence": "Content is clearly U2-focused: 'Wire TokenBucket into the /api/v1/messages middleware', 'Create: services/api-gateway/src/middleware/rate_limit.ts', U1 and U3 explicitly marked out of scope. However, literal <task>/<files>/<patterns>/<approach>/<constraints>/<testing>/<verify> XML tags are absent \u2014 content is under markdown headings."
+        },
+        {
+          "text": "The metadata footer (HTML comment) uses `unit_id: U2` (singular), NOT `unit_ids:` (plural), and includes `agent_name: jackson`, `worktree_path: /Users/ryan/conductor/workspaces/api-gateway/jackson`, and either `dependencies: U1` or no `dependencies:` line at all (the MVP drops the field but listing this unit's stated dependency is acceptable in prose).",
+          "passed": false,
+          "evidence": "There is no HTML comment metadata footer at all. No '<!-- unit_id: U2 ... -->' block is present."
+        },
+        {
+          "text": "The output proposes exactly ONE `gh issue create` invocation, not multiple. The command must include `--label ce-dispatch` and a body file or heredoc carrying the rendered prompt \u2014 not a partial body or a JSON dump.",
+          "passed": true,
+          "evidence": "Single command shown: 'gh issue create --title \"Dispatch U2: ...\" --label \"ce-dispatch\" --body-file /tmp/dispatch-u2-body.md'."
+        },
+        {
+          "text": "The output does NOT contain a dependency-graph rendering, a parallel-safety check, a six-option monitor menu, or any reference to `dispatch_mode` / `dispatch_auto_review` (these were removed in the single-unit sync MVP).",
+          "passed": true,
+          "evidence": "No dependency graph, parallel-safety check, monitor menu, or dispatch_mode/dispatch_auto_review references appear in the output."
+        },
+        {
+          "text": "The output does NOT actually invoke `gh issue create` (since the user asked for a dry-run rendering); the agent surfaces the command but defers execution.",
+          "passed": true,
+          "evidence": "'I did not actually call `gh issue create` or write any file.' \u2014 the command is shown but explicitly not executed."
+        }
+      ],
+      "notes": "The output demonstrates correct unit selection (U2) and a clean single gh command, but fails the structural/templating expectations entirely. Most failures cluster around missing XML-style sections and the metadata footer \u2014 suggesting the agent did not have (or did not follow) the dispatch-template specification."
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "2-phase-4-respond-review-pr",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 22.33,
+        "tokens": 13869,
+        "tool_calls": 0,
+        "errors": 0,
+        "cost_usd": 0.10347975
+      },
+      "expectations": [
+        {
+          "text": "The output names exactly four options in the Phase 4 respond menu, including 'Reply to agent comment', 'Review the PR', 'Mark unit complete', and 'Done for now' \u2014 not six options, no 'Show dependency graph', no 'Dispatch newly unblocked units'.",
+          "passed": true,
+          "evidence": "'1. Reply to agent comment\n2. Review the PR  \u2190 you indicated this\n3. Mark unit complete\n4. Done for now'"
+        },
+        {
+          "text": "When executing the 'Review the PR' branch, the output uses `gh pr view <number>` (or `--json`) and `gh pr diff <number>` to pull PR state.",
+          "passed": false,
+          "evidence": "Uses `gh pr view 142 --json ...` but never invokes `gh pr diff 142` to pull the diff."
+        },
+        {
+          "text": "Any `gh pr list` invocation in the respond loop includes the `--state all` flag (otherwise merged PRs become invisible to the loop).",
+          "passed": true,
+          "evidence": "'gh pr list --state all --search \"<issue-number> in:body\" ...' and explicit note '--state all is required because gh pr list defaults to open PRs only.'"
+        },
+        {
+          "text": "The output routes review work through the existing `/ce-code-review` skill (via the platform's skill-invocation primitive) OR captures user-typed feedback and posts it via `gh pr review` \u2014 it does NOT inline a fresh code-review prompt or invent a new review framework.",
+          "passed": true,
+          "evidence": "'I'd invoke the `ce-code-review` skill via the `Skill` tool' and 'gh pr review 142 --comment --body-file ...'"
+        },
+        {
+          "text": "The output does NOT mention any auto-review / `dispatch_auto_review` config, dependency-aware merge gating, or auto re-dispatch of newly unblocked units.",
+          "passed": true,
+          "evidence": "No mention of dispatch_auto_review, auto-review, dependency-aware merge gating, or auto re-dispatch anywhere in the output."
+        }
+      ],
+      "notes": "Expectations are concrete and well-targeted. The [1]/[3] interaction is slightly in tension: if review is routed to a sub-skill, the orchestrator may legitimately skip fetching the diff itself."
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "2-phase-4-respond-review-pr",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5,
+        "time_seconds": 15.7,
+        "tokens": 1446,
+        "tool_calls": 0,
+        "errors": 0,
+        "cost_usd": 0.0298089
+      },
+      "expectations": [
+        {
+          "text": "The output names exactly four options in the Phase 4 respond menu, including 'Reply to agent comment', 'Review the PR', 'Mark unit complete', and 'Done for now' \u2014 not six options, no 'Show dependency graph', no 'Dispatch newly unblocked units'.",
+          "passed": false,
+          "evidence": "The output does not present a Phase 4 respond menu at all. It walks through reviewing PR #142 in steps but never enumerates the four menu options ('Reply to agent comment', 'Review the PR', 'Mark unit complete', 'Done for now')."
+        },
+        {
+          "text": "When executing the 'Review the PR' branch, the output uses `gh pr view <number>` (or `--json`) and `gh pr diff <number>` to pull PR state.",
+          "passed": true,
+          "evidence": "Step 2 uses `gh pr view 142` and `gh pr view 142 --json ...`; Step 5 uses `gh pr diff 142`."
+        },
+        {
+          "text": "Any `gh pr list` invocation in the respond loop includes the `--state all` flag (otherwise merged PRs become invisible to the loop).",
+          "passed": true,
+          "evidence": "No `gh pr list` invocation appears in the output, so the constraint is vacuously satisfied."
+        },
+        {
+          "text": "The output routes review work through the existing `/ce-code-review` skill (via the platform's skill-invocation primitive) OR captures user-typed feedback and posts it via `gh pr review` \u2014 it does NOT inline a fresh code-review prompt or invent a new review framework.",
+          "passed": false,
+          "evidence": "The output invents its own review framework (Steps 1\u20138 with a 'review brief' including 'Scope match vs U2 acceptance criteria (\u2705/\u26a0\ufe0f per criterion), CI status, Files changed + LOC, Concerns / questions / suggested change requests, My recommendation'). It does not invoke `/ce-code-review`. It does use `gh pr review` for posting, but the review work itself is done via an inlined ad-hoc framework rather than the existing skill or purely user-typed feedback."
+        },
+        {
+          "text": "The output does NOT mention any auto-review / `dispatch_auto_review` config, dependency-aware merge gating, or auto re-dispatch of newly unblocked units.",
+          "passed": true,
+          "evidence": "No mention of auto-review, dispatch_auto_review, dependency-aware merge gating, or auto re-dispatch appears in the output."
+        }
+      ],
+      "notes": "Eval is reasonable but some expectations (menu enumeration, pr list flag) depend on prompt framing that may not have elicited them."
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "3-phase-4-respond-reply-to-agent-comment",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 15.34,
+        "tokens": 13357,
+        "tool_calls": 0,
+        "errors": 0,
+        "cost_usd": 0.08965935
+      },
+      "expectations": [
+        {
+          "text": "The output uses `gh issue view 87 --comments` (or `gh api` equivalent) to pull the issue comment thread before composing a reply.",
+          "passed": true,
+          "evidence": "`gh issue view 87 --json comments,body --jq '.comments[-3:]'` used before composing reply"
+        },
+        {
+          "text": "The output's reply body starts with the literal pattern `[orchestrator -> jackson]` followed by an ISO 8601 UTC timestamp (e.g., `2026-05-04T12:34:00Z`) \u2014 matching the comment-protocol section in the dispatched prompt template.",
+          "passed": true,
+          "evidence": "`**[orchestrator -> jackson] 2025-01-20T18:42:00Z**` at start of reply body"
+        },
+        {
+          "text": "The output uses `gh issue comment 87` (with `--body` or `--body-file`) to post the reply, NOT `gh pr comment` (the issue is the surface, not the PR).",
+          "passed": true,
+          "evidence": "`gh issue comment 87 --body-file \"$SCRATCH/reply.md\"`"
+        },
+        {
+          "text": "The reply body explicitly states the decision (use standalone Redis) and a brief rationale (already in stack, no cluster), reflecting the orchestrator's input \u2014 it does NOT just paraphrase the agent's question without answering.",
+          "passed": true,
+          "evidence": "'Use **standalone Redis**. Do not introduce Redis Cluster mode' + rationale 'We already run a standalone Redis in this stack'"
+        },
+        {
+          "text": "The output does NOT modify the issue body itself or the metadata footer; comments are append-only per the protocol.",
+          "passed": true,
+          "evidence": "Only `gh issue comment` is used; no edit of issue body or footer"
+        }
+      ],
+      "notes": "Expectations are well-scoped and verifiable from the transcript."
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "3-phase-4-respond-reply-to-agent-comment",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5,
+        "time_seconds": 11.01,
+        "tokens": 1257,
+        "tool_calls": 0,
+        "errors": 0,
+        "cost_usd": 0.02398275
+      },
+      "expectations": [
+        {
+          "text": "The output uses `gh issue view 87 --comments` (or `gh api` equivalent) to pull the issue comment thread before composing a reply.",
+          "passed": false,
+          "evidence": "No `gh issue view 87 --comments` or equivalent `gh api` call appears in the output; the agent proceeds directly to composing a comment without fetching the thread."
+        },
+        {
+          "text": "The output's reply body starts with the literal pattern `[orchestrator -> jackson]` followed by an ISO 8601 UTC timestamp (e.g., `2026-05-04T12:34:00Z`) \u2014 matching the comment-protocol section in the dispatched prompt template.",
+          "passed": false,
+          "evidence": "Reply body begins with 'Decision: **Use standalone Redis**...'; no `[orchestrator -> jackson]` prefix or ISO 8601 timestamp is present."
+        },
+        {
+          "text": "The output uses `gh issue comment 87` (with `--body` or `--body-file`) to post the reply, NOT `gh pr comment` (the issue is the surface, not the PR).",
+          "passed": true,
+          "evidence": "`gh issue comment 87 --body \"$(cat <<'EOF' ... EOF\n)\"`"
+        },
+        {
+          "text": "The reply body explicitly states the decision (use standalone Redis) and a brief rationale (already in stack, no cluster), reflecting the orchestrator's input \u2014 it does NOT just paraphrase the agent's question without answering.",
+          "passed": true,
+          "evidence": "'Decision: **Use standalone Redis**' and rationale 'We already run a standalone Redis in this stack; reuse it rather than introducing new infrastructure.' plus notes on avoiding cluster mode."
+        },
+        {
+          "text": "The output does NOT modify the issue body itself or the metadata footer; comments are append-only per the protocol.",
+          "passed": true,
+          "evidence": "Only `gh issue comment` is used; no `gh issue edit` or body modification is performed."
+        }
+      ],
+      "notes": "Reasonable expectations, but [1] in particular requires the protocol template to be in-context; ensure the eval prompt includes it or adjust scoring."
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "4-phase-4-respond-mark-unit-complete",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 9.99,
+        "tokens": 12802,
+        "tool_calls": 0,
+        "errors": 0,
+        "cost_usd": 0.0780417
+      },
+      "expectations": [
+        {
+          "text": "The output uses `gh issue close 87` (or `gh issue close <num> --comment <closeout>`) to close the dispatched issue.",
+          "passed": true,
+          "evidence": "`gh issue close 87 --comment \"Unit U2 complete. PR merged: https://github.com/<owner>/<repo>/pull/142.\"`"
+        },
+        {
+          "text": "The output explicitly tells the user to archive the Conductor workspace at the worktree path (or remove it manually) \u2014 the skill cannot do this itself, but it must surface the instruction.",
+          "passed": true,
+          "evidence": "\"You can archive the Conductor workspace for this dispatch now via Conductor's Archive action \u2014 the worktree is no longer needed.\""
+        },
+        {
+          "text": "Before closing, the output verifies (via `gh pr view 142 --json state` or similar) that PR #142 is actually in `MERGED` state \u2014 it does NOT close the issue solely on the user's word, since user could be mistaken.",
+          "passed": true,
+          "evidence": "Step 1: `gh pr view 142 --json number,state,merged,mergedAt,mergeCommit,url` with stop-if-not-merged guard."
+        },
+        {
+          "text": "Any `gh pr list` or `gh pr view` includes the `--state all` flag if listing is involved (so merged PRs remain visible).",
+          "passed": true,
+          "evidence": "No `gh pr list` used; `gh pr view 142` with explicit PR number doesn't require --state all. Vacuously satisfied."
+        },
+        {
+          "text": "The output does NOT attempt to archive the Conductor workspace itself (Conductor archival is a manual user step), and does NOT delete the worktree directory.",
+          "passed": true,
+          "evidence": "Instructs user to archive via Conductor's Archive action; no rm or worktree deletion commands present."
+        }
+      ],
+      "notes": "Well-targeted expectations for the Phase 4 close-out path."
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "4-phase-4-respond-mark-unit-complete",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5,
+        "time_seconds": 9.43,
+        "tokens": 1033,
+        "tool_calls": 0,
+        "errors": 0,
+        "cost_usd": 0.02055735
+      },
+      "expectations": [
+        {
+          "text": "The output uses `gh issue close 87` (or `gh issue close <num> --comment <closeout>`) to close the dispatched issue.",
+          "passed": true,
+          "evidence": "`gh issue close 87 --reason completed` in step 2"
+        },
+        {
+          "text": "The output explicitly tells the user to archive the Conductor workspace at the worktree path (or remove it manually) \u2014 the skill cannot do this itself, but it must surface the instruction.",
+          "passed": false,
+          "evidence": "No mention of Conductor workspace archival or worktree cleanup anywhere in the output."
+        },
+        {
+          "text": "Before closing, the output verifies (via `gh pr view 142 --json state` or similar) that PR #142 is actually in `MERGED` state \u2014 it does NOT close the issue solely on the user's word, since user could be mistaken.",
+          "passed": false,
+          "evidence": "Verification step `gh pr view 142 --json state,mergedAt,...` appears in step 4, AFTER the close command in step 2. The close is not gated on verified merge state."
+        },
+        {
+          "text": "Any `gh pr list` or `gh pr view` includes the `--state all` flag if listing is involved (so merged PRs remain visible).",
+          "passed": false,
+          "evidence": "`gh pr view 142 --json state,mergedAt,mergeCommit,baseRefName` has no `--state all` flag. (Note: `pr view` by number doesn't strictly require it, but expectation says any pr view/list should include it.)"
+        },
+        {
+          "text": "The output does NOT attempt to archive the Conductor workspace itself (Conductor archival is a manual user step), and does NOT delete the worktree directory.",
+          "passed": true,
+          "evidence": "No rm, git worktree remove, or conductor archive commands appear in the output."
+        }
+      ],
+      "notes": "Expectations are reasonable; the Conductor-archive instruction and verify-before-close ordering are the key discriminators."
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.95,
+        "stddev": 0.0866,
+        "min": 0.8,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 29.1775,
+        "stddev": 23.4326,
+        "min": 9.99,
+        "max": 69.05
+      },
+      "tokens": {
+        "mean": 15034.75,
+        "stddev": 2954.9664,
+        "min": 12802.0,
+        "max": 20111.0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.5111,
+        "stddev": 0.0903,
+        "min": 0.4,
+        "max": 0.6
+      },
+      "time_seconds": {
+        "mean": 14.2975,
+        "stddev": 4.5294,
+        "min": 9.43,
+        "max": 21.05
+      },
+      "tokens": {
+        "mean": 2035.5,
+        "stddev": 1376.3947,
+        "min": 1033.0,
+        "max": 4406.0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.4389",
+      "time_seconds": "+14.88",
+      "tokens": "+12999.25"
+    }
+  },
+  "notes": []
+}

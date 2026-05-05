@@ -1,0 +1,77 @@
+{
+  "expectations": [
+    {
+      "text": "The output renders a complete <orientation> section listing repo-relative orientation files (README/AGENTS.md/plan path/architecture doc/pattern files) \u2014 not inlined content, just paths.",
+      "passed": true,
+      "evidence": "<orientation> section lists README.md, AGENTS.md, CLAUDE.md, docs/architecture.md, services/api-gateway/src/middleware/auth.ts, token_bucket.ts, etc. as paths."
+    },
+    {
+      "text": "The output renders an <agent-identity> section with `agent-name: jackson` (the dirname of the worktree path) and `worktree-path: /Users/ryan/conductor/workspaces/api-gateway/jackson`.",
+      "passed": true,
+      "evidence": "<agent-identity>\\n- agent-name: `jackson`\\n- worktree-path: `/Users/ryan/conductor/workspaces/api-gateway/jackson`"
+    },
+    {
+      "text": "The output renders a <comment-protocol> section that includes the literal prefix shape `[<agent-name> -> orchestrator]` and an explicit STOP-and-wait directive after asking a clarification.",
+      "passed": true,
+      "evidence": "`**[jackson -> orchestrator] <ISO 8601 UTC timestamp>**` and 'STOP. Do not proceed past the open question. Do not start related work. Wait for an...'"
+    },
+    {
+      "text": "The output renders a <ce-plugin> block whose body is a numbered nine-step compound-engineering loop in this order: read orientation -> /ce-work -> implement -> /ce-code-review -> /ce-compound (optional) -> /ce-commit-push-pr -> comment with PR URL -> stop and wait -> /ce-resolve-pr-feedback on ping.",
+      "passed": true,
+      "evidence": "Nine numbered steps: 1. Read orientation, 2. /ce-work, 3. Implement, 4. /ce-code-review, 5. /ce-compound, 6. /ce-commit-push-pr, 7. Append comment with PR URL, 8. Stop and wait, 9. On ping /ce-resolve-pr-feedback."
+    },
+    {
+      "text": "The output's <task>, <files>, <patterns>, <approach>, <constraints>, <testing>, and <verify> sections are populated from U2 of the supplied plan (token-bucket middleware on /api/v1/messages), NOT from U1 (token-bucket primitive) or U3 (per-tenant override).",
+      "passed": true,
+      "evidence": "<task>: 'Add a `rateLimitMiddleware` that calls `TokenBucket.consume(1)` keyed on the JWT subject claim...'; constraints warn against starting U3's per-tenant override."
+    },
+    {
+      "text": "The metadata footer (HTML comment) uses `unit_id: U2` (singular), NOT `unit_ids:` (plural), and includes `agent_name: jackson`, `worktree_path: /Users/ryan/conductor/workspaces/api-gateway/jackson`, and either `dependencies: U1` or no `dependencies:` line at all (the MVP drops the field but listing this unit's stated dependency is acceptable in prose).",
+      "passed": true,
+      "evidence": "Metadata: 'unit_id: U2\\nagent_name: jackson\\nworktree_path: /Users/ryan/conductor/workspaces/api-gateway/jackson' with no dependencies line."
+    },
+    {
+      "text": "The output proposes exactly ONE `gh issue create` invocation, not multiple. The command must include `--label ce-dispatch` and a body file or heredoc carrying the rendered prompt \u2014 not a partial body or a JSON dump.",
+      "passed": true,
+      "evidence": "Single `gh issue create --title ... --body-file \"$SCRATCH/issue-body.md\" --label ce-dispatch`"
+    },
+    {
+      "text": "The output does NOT contain a dependency-graph rendering, a parallel-safety check, a six-option monitor menu, or any reference to `dispatch_mode` / `dispatch_auto_review` (these were removed in the single-unit sync MVP).",
+      "passed": true,
+      "evidence": "No mention of dependency graph, parallel-safety, six-option monitor menu, or dispatch_mode/dispatch_auto_review fields."
+    },
+    {
+      "text": "The output does NOT actually invoke `gh issue create` (since the user asked for a dry-run rendering); the agent surfaces the command but defers execution.",
+      "passed": true,
+      "evidence": "'The `gh issue create` command I would run' and 'A few things I'd flag to you before actually running the command' \u2014 command shown, not executed."
+    }
+  ],
+  "summary": {
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "pass_rate": 1.0
+  },
+  "eval_feedback": {
+    "suggestions": [
+      "Expectation [5] is slightly ambiguous on whether a `dependencies:` line is forbidden or merely optional \u2014 the phrasing 'either `dependencies: U1` or no `dependencies:` line at all' could be tightened."
+    ],
+    "overall": "Eval is well-scoped and the expectations map cleanly to observable artifacts in the rendered output."
+  },
+  "execution_metrics": {
+    "tool_calls": {},
+    "total_tool_calls": 0,
+    "total_steps": 1,
+    "files_created": [
+      "outputs/output.md"
+    ],
+    "errors_encountered": 0,
+    "output_chars": 14609,
+    "transcript_chars": 39091
+  },
+  "timing": {
+    "executor_duration_seconds": 69.05,
+    "grader_duration_seconds": 20.02,
+    "total_duration_seconds": 89.07
+  }
+}

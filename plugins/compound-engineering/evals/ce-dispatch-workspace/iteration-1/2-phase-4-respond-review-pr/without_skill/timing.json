@@ -1,0 +1,14 @@
+{
+  "total_tokens": 1446,
+  "duration_ms": 15699,
+  "total_duration_seconds": 15.7,
+  "executor_start": "2026-05-05T09:57:31Z",
+  "executor_end": "2026-05-05T09:57:47Z",
+  "executor_duration_seconds": 15.7,
+  "prompt_tokens": 302,
+  "completion_tokens": 1144,
+  "cost_usd": 0.0298089,
+  "grader_start": "2026-05-05T09:57:47Z",
+  "grader_end": "2026-05-05T09:57:57Z",
+  "grader_duration_seconds": 9.98
+}

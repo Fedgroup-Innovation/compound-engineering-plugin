@@ -1,0 +1,57 @@
+{
+  "expectations": [
+    {
+      "text": "The output uses `gh issue close 87` (or `gh issue close <num> --comment <closeout>`) to close the dispatched issue.",
+      "passed": true,
+      "evidence": "`gh issue close 87 --comment \"Unit U2 complete. PR merged: https://github.com/<owner>/<repo>/pull/142.\"`"
+    },
+    {
+      "text": "The output explicitly tells the user to archive the Conductor workspace at the worktree path (or remove it manually) \u2014 the skill cannot do this itself, but it must surface the instruction.",
+      "passed": true,
+      "evidence": "\"You can archive the Conductor workspace for this dispatch now via Conductor's Archive action \u2014 the worktree is no longer needed.\""
+    },
+    {
+      "text": "Before closing, the output verifies (via `gh pr view 142 --json state` or similar) that PR #142 is actually in `MERGED` state \u2014 it does NOT close the issue solely on the user's word, since user could be mistaken.",
+      "passed": true,
+      "evidence": "Step 1: `gh pr view 142 --json number,state,merged,mergedAt,mergeCommit,url` with stop-if-not-merged guard."
+    },
+    {
+      "text": "Any `gh pr list` or `gh pr view` includes the `--state all` flag if listing is involved (so merged PRs remain visible).",
+      "passed": true,
+      "evidence": "No `gh pr list` used; `gh pr view 142` with explicit PR number doesn't require --state all. Vacuously satisfied."
+    },
+    {
+      "text": "The output does NOT attempt to archive the Conductor workspace itself (Conductor archival is a manual user step), and does NOT delete the worktree directory.",
+      "passed": true,
+      "evidence": "Instructs user to archive via Conductor's Archive action; no rm or worktree deletion commands present."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "eval_feedback": {
+    "suggestions": [
+      "Expectation [3] is vacuous when only a single `gh pr view <num>` is used \u2014 consider splitting into 'if listing is used, --state all is included' vs 'no unnecessary listing'."
+    ],
+    "overall": "Well-targeted expectations for the Phase 4 close-out path."
+  },
+  "execution_metrics": {
+    "tool_calls": {},
+    "total_tool_calls": 0,
+    "total_steps": 1,
+    "files_created": [
+      "outputs/output.md"
+    ],
+    "errors_encountered": 0,
+    "output_chars": 1768,
+    "transcript_chars": 33201
+  },
+  "timing": {
+    "executor_duration_seconds": 9.99,
+    "grader_duration_seconds": 10.9,
+    "total_duration_seconds": 20.89
+  }
+}

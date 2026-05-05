@@ -1,0 +1,77 @@
+{
+  "expectations": [
+    {
+      "text": "The output renders a complete <orientation> section listing repo-relative orientation files (README/AGENTS.md/plan path/architecture doc/pattern files) \u2014 not inlined content, just paths.",
+      "passed": false,
+      "evidence": "No <orientation> section/tag exists in the output. The output is structured as a markdown issue body with sections like Context, Scope, Files, Patterns to Follow \u2014 but no explicit orientation block listing README/AGENTS.md/plan path/architecture docs."
+    },
+    {
+      "text": "The output renders an <agent-identity> section with `agent-name: jackson` (the dirname of the worktree path) and `worktree-path: /Users/ryan/conductor/workspaces/api-gateway/jackson`.",
+      "passed": false,
+      "evidence": "No <agent-identity> tag. The workspace path appears ('Workspace: /Users/ryan/conductor/workspaces/api-gateway/jackson') but there's no agent-name: jackson identity block."
+    },
+    {
+      "text": "The output renders a <comment-protocol> section that includes the literal prefix shape `[<agent-name> -> orchestrator]` and an explicit STOP-and-wait directive after asking a clarification.",
+      "passed": false,
+      "evidence": "No <comment-protocol> section or '[<agent-name> -> orchestrator]' prefix appears anywhere in the output."
+    },
+    {
+      "text": "The output renders a <ce-plugin> block whose body is a numbered nine-step compound-engineering loop in this order: read orientation -> /ce-work -> implement -> /ce-code-review -> /ce-compound (optional) -> /ce-commit-push-pr -> comment with PR URL -> stop and wait -> /ce-resolve-pr-feedback on ping.",
+      "passed": false,
+      "evidence": "No <ce-plugin> block or any reference to /ce-work, /ce-code-review, /ce-compound, /ce-commit-push-pr, or /ce-resolve-pr-feedback commands."
+    },
+    {
+      "text": "The output's <task>, <files>, <patterns>, <approach>, <constraints>, <testing>, and <verify> sections are populated from U2 of the supplied plan (token-bucket middleware on /api/v1/messages), NOT from U1 (token-bucket primitive) or U3 (per-tenant override).",
+      "passed": true,
+      "evidence": "Content is clearly U2-focused: 'Wire TokenBucket into the /api/v1/messages middleware', 'Create: services/api-gateway/src/middleware/rate_limit.ts', U1 and U3 explicitly marked out of scope. However, literal <task>/<files>/<patterns>/<approach>/<constraints>/<testing>/<verify> XML tags are absent \u2014 content is under markdown headings."
+    },
+    {
+      "text": "The metadata footer (HTML comment) uses `unit_id: U2` (singular), NOT `unit_ids:` (plural), and includes `agent_name: jackson`, `worktree_path: /Users/ryan/conductor/workspaces/api-gateway/jackson`, and either `dependencies: U1` or no `dependencies:` line at all (the MVP drops the field but listing this unit's stated dependency is acceptable in prose).",
+      "passed": false,
+      "evidence": "There is no HTML comment metadata footer at all. No '<!-- unit_id: U2 ... -->' block is present."
+    },
+    {
+      "text": "The output proposes exactly ONE `gh issue create` invocation, not multiple. The command must include `--label ce-dispatch` and a body file or heredoc carrying the rendered prompt \u2014 not a partial body or a JSON dump.",
+      "passed": true,
+      "evidence": "Single command shown: 'gh issue create --title \"Dispatch U2: ...\" --label \"ce-dispatch\" --body-file /tmp/dispatch-u2-body.md'."
+    },
+    {
+      "text": "The output does NOT contain a dependency-graph rendering, a parallel-safety check, a six-option monitor menu, or any reference to `dispatch_mode` / `dispatch_auto_review` (these were removed in the single-unit sync MVP).",
+      "passed": true,
+      "evidence": "No dependency graph, parallel-safety check, monitor menu, or dispatch_mode/dispatch_auto_review references appear in the output."
+    },
+    {
+      "text": "The output does NOT actually invoke `gh issue create` (since the user asked for a dry-run rendering); the agent surfaces the command but defers execution.",
+      "passed": true,
+      "evidence": "'I did not actually call `gh issue create` or write any file.' \u2014 the command is shown but explicitly not executed."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 5,
+    "total": 9,
+    "pass_rate": 0.4444
+  },
+  "eval_feedback": {
+    "suggestions": [
+      "The agent produced a plausible GitHub issue body but ignored the specific XML-tagged prompt template (<orientation>, <agent-identity>, <comment-protocol>, <ce-plugin>, <task>, etc.) and the HTML-comment metadata footer that the MVP requires. Either the prompt under test did not clearly specify the template, or the agent silently substituted a generic issue format. Consider adding the expected template skeleton to the grader input so it can be cross-referenced, and/or tightening the user-facing prompt to require verbatim tag names."
+    ],
+    "overall": "The output demonstrates correct unit selection (U2) and a clean single gh command, but fails the structural/templating expectations entirely. Most failures cluster around missing XML-style sections and the metadata footer \u2014 suggesting the agent did not have (or did not follow) the dispatch-template specification."
+  },
+  "execution_metrics": {
+    "tool_calls": {},
+    "total_tool_calls": 0,
+    "total_steps": 1,
+    "files_created": [
+      "outputs/output.md"
+    ],
+    "errors_encountered": 0,
+    "output_chars": 4197,
+    "transcript_chars": 6674
+  },
+  "timing": {
+    "executor_duration_seconds": 21.05,
+    "grader_duration_seconds": 19.63,
+    "total_duration_seconds": 40.68
+  }
+}

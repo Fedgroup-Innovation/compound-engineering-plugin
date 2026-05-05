@@ -1,0 +1,65 @@
+{
+  "skill_name": "ce-dispatch",
+  "evals": [
+    {
+      "id": 1,
+      "name": "happy-path-single-unit-dispatch",
+      "prompt": "I have a multi-unit plan at evals/files/sample-multi-unit-plan.md and I want to dispatch ONLY unit U2 to a Conductor workspace. The workspace I just created is at /Users/ryan/conductor/workspaces/api-gateway/jackson. Render the GitHub issue body you would create (do not actually create the issue), including all template sections, and tell me the final `gh issue create` command you would run. Use the dispatch defaults: branch prefix `dispatch/`, base branch `main`, labels `ce-dispatch`.",
+      "expected_output": "A complete dispatch issue body (rendered from the dispatch-prompt-template), populated for unit U2 of the rate-limit plan. Includes <orientation>, <agent-identity>, <task>, <files>, <patterns>, <approach>, <constraints>, <testing>, <verify>, <output-contract>, <comment-protocol>, <ce-plugin>, plus the metadata footer with `unit_id: U2`, `agent_name: jackson`, `worktree_path: /Users/ryan/conductor/workspaces/api-gateway/jackson`. Plus the literal `gh issue create` command line.",
+      "files": ["evals/files/sample-multi-unit-plan.md"],
+      "expectations": [
+        "The output renders a complete <orientation> section listing repo-relative orientation files (README/AGENTS.md/plan path/architecture doc/pattern files) — not inlined content, just paths.",
+        "The output renders an <agent-identity> section with `agent-name: jackson` (the dirname of the worktree path) and `worktree-path: /Users/ryan/conductor/workspaces/api-gateway/jackson`.",
+        "The output renders a <comment-protocol> section that includes the literal prefix shape `[<agent-name> -> orchestrator]` and an explicit STOP-and-wait directive after asking a clarification.",
+        "The output renders a <ce-plugin> block whose body is a numbered nine-step compound-engineering loop in this order: read orientation -> /ce-work -> implement -> /ce-code-review -> /ce-compound (optional) -> /ce-commit-push-pr -> comment with PR URL -> stop and wait -> /ce-resolve-pr-feedback on ping.",
+        "The output's <task>, <files>, <patterns>, <approach>, <constraints>, <testing>, and <verify> sections are populated from U2 of the supplied plan (token-bucket middleware on /api/v1/messages), NOT from U1 (token-bucket primitive) or U3 (per-tenant override).",
+        "The metadata footer (HTML comment) uses `unit_id: U2` (singular), NOT `unit_ids:` (plural), and includes `agent_name: jackson`, `worktree_path: /Users/ryan/conductor/workspaces/api-gateway/jackson`, and either `dependencies: U1` or no `dependencies:` line at all (the MVP drops the field but listing this unit's stated dependency is acceptable in prose).",
+        "The output proposes exactly ONE `gh issue create` invocation, not multiple. The command must include `--label ce-dispatch` and a body file or heredoc carrying the rendered prompt — not a partial body or a JSON dump.",
+        "The output does NOT contain a dependency-graph rendering, a parallel-safety check, a six-option monitor menu, or any reference to `dispatch_mode` / `dispatch_auto_review` (these were removed in the single-unit sync MVP).",
+        "The output does NOT actually invoke `gh issue create` (since the user asked for a dry-run rendering); the agent surfaces the command but defers execution."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "phase-4-respond-review-pr",
+      "prompt": "I'm the orchestrator. The agent in the dispatched workspace at /Users/ryan/conductor/workspaces/api-gateway/jackson just opened PR #142 against the issue we created for unit U2 of the rate-limit plan. Bring me into the dispatch respond loop. I want to review the PR. Walk me through what you would do, in order, including the exact `gh` commands.",
+      "expected_output": "The agent enters Phase 4 respond loop, surfaces the four-option menu, executes the 'Review the PR' branch: pulls PR #142 via `gh pr view --json` (with `--state all` so merged PRs aren't invisible), pulls the diff, and either invokes `/ce-code-review` against the branch or captures user-typed feedback. If feedback, posts it via `gh pr review --comment` or `--request-changes`.",
+      "files": [],
+      "expectations": [
+        "The output names exactly four options in the Phase 4 respond menu, including 'Reply to agent comment', 'Review the PR', 'Mark unit complete', and 'Done for now' — not six options, no 'Show dependency graph', no 'Dispatch newly unblocked units'.",
+        "When executing the 'Review the PR' branch, the output uses `gh pr view <number>` (or `--json`) to pull PR state. If the agent inspects the diff itself rather than delegating to `/ce-code-review`, it must also run `gh pr diff <number>`; if it delegates to `/ce-code-review`, that sub-skill is expected to handle diff fetching and a direct `gh pr diff` invocation is optional.",
+        "Any `gh pr list` invocation in the respond loop includes the `--state all` flag (otherwise merged PRs become invisible to the loop).",
+        "The output routes review work through the existing `/ce-code-review` skill (via the platform's skill-invocation primitive) OR captures user-typed feedback and posts it via `gh pr review` — it does NOT inline a fresh code-review prompt or invent a new review framework.",
+        "The output does NOT mention any auto-review / `dispatch_auto_review` config, dependency-aware merge gating, or auto re-dispatch of newly unblocked units."
+      ]
+    },
+    {
+      "id": 3,
+      "name": "phase-4-respond-reply-to-agent-comment",
+      "prompt": "I'm the orchestrator. I just got pinged that the agent in workspace /Users/ryan/conductor/workspaces/api-gateway/jackson posted a comment on the dispatched issue (issue #87, unit U2 of the rate-limit plan) asking whether we should use Redis Cluster mode or standalone Redis for the rate-limiter backend. The decision is standalone (we already have a standalone Redis in this stack and don't want to introduce cluster mode). Help me reply via the dispatch respond loop. Include the exact `gh` command you would run.",
+      "expected_output": "The agent enters Phase 4 respond loop, picks 'Reply to agent comment', surfaces the latest agent comment via `gh issue view 87 --comments` (or equivalent), captures the orchestrator's reply, and posts the reply via `gh issue comment 87 --body` with a body that begins with `[orchestrator -> jackson] <ISO 8601 UTC timestamp>` — matching the comment-protocol format the agent expects.",
+      "files": [],
+      "expectations": [
+        "The output uses `gh issue view 87 --comments` (or `gh api` equivalent) to pull the issue comment thread before composing a reply.",
+        "The output's reply body starts with the literal pattern `[orchestrator -> jackson]` followed by an ISO 8601 UTC timestamp (e.g., `2026-05-04T12:34:00Z`) — matching the comment-protocol section in the dispatched prompt template.",
+        "The output uses `gh issue comment 87` (with `--body` or `--body-file`) to post the reply, NOT `gh pr comment` (the issue is the surface, not the PR).",
+        "The reply body explicitly states the decision (use standalone Redis) and a brief rationale (already in stack, no cluster), reflecting the orchestrator's input — it does NOT just paraphrase the agent's question without answering.",
+        "The output does NOT modify the issue body itself or the metadata footer; comments are append-only per the protocol."
+      ]
+    },
+    {
+      "id": 4,
+      "name": "phase-4-respond-mark-unit-complete",
+      "prompt": "I'm the orchestrator. PR #142 (unit U2 of the rate-limit plan, dispatched to issue #87) was just merged. Bring me into the respond loop and mark the unit complete. Include the exact `gh` commands.",
+      "expected_output": "The agent enters Phase 4 respond loop, picks 'Mark unit complete', closes issue #87 via `gh issue close`, and tells the user to archive the Conductor workspace at /Users/ryan/conductor/workspaces/api-gateway/jackson. Optionally posts a final comment summarizing the closeout.",
+      "files": [],
+      "expectations": [
+        "The output uses `gh issue close 87` (or `gh issue close <num> --comment <closeout>`) to close the dispatched issue.",
+        "The output explicitly tells the user to archive the Conductor workspace at the worktree path (or remove it manually) — the skill cannot do this itself, but it must surface the instruction.",
+        "Before closing, the output verifies (via `gh pr view 142 --json state` or similar) that PR #142 is actually in `MERGED` state — it does NOT close the issue solely on the user's word, since user could be mistaken.",
+        "Any `gh pr list` or `gh pr view` includes the `--state all` flag if listing is involved (so merged PRs remain visible).",
+        "The output does NOT attempt to archive the Conductor workspace itself (Conductor archival is a manual user step), and does NOT delete the worktree directory."
+      ]
+    }
+  ]
+}

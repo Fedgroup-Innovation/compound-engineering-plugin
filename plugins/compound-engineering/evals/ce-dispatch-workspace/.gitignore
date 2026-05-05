@@ -1,0 +1,16 @@
+# Workspace for skill-creator-style eval runs of ce-dispatch.
+#
+# Raw transcripts and tool-call dumps can be large and noisy.
+# Keep grading.json, benchmark.json, eval_metadata.json, and
+# the prompt/output skeleton checked in as battle-test evidence;
+# exclude the heavy raw transcript dumps.
+
+# Heavy raw transcript text (regenerable from the runner)
+**/transcript-raw.md
+**/transcript-raw.json
+
+# Streaming chunks captured during runs
+**/*.stream.jsonl
+
+# Large-file outputs that exceed 1 MB
+**/outputs/*.bin

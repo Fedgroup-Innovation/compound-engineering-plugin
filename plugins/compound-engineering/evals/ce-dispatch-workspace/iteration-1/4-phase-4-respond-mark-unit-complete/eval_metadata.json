@@ -1,0 +1,14 @@
+{
+  "eval_id": 4,
+  "eval_name": "phase-4-respond-mark-unit-complete",
+  "prompt": "I'm the orchestrator. PR #142 (unit U2 of the rate-limit plan, dispatched to issue #87) was just merged. Bring me into the respond loop and mark the unit complete. Include the exact `gh` commands.",
+  "expected_output": "The agent enters Phase 4 respond loop, picks 'Mark unit complete', closes issue #87 via `gh issue close`, and tells the user to archive the Conductor workspace at /Users/ryan/conductor/workspaces/api-gateway/jackson. Optionally posts a final comment summarizing the closeout.",
+  "files": [],
+  "expectations": [
+    "The output uses `gh issue close 87` (or `gh issue close <num> --comment <closeout>`) to close the dispatched issue.",
+    "The output explicitly tells the user to archive the Conductor workspace at the worktree path (or remove it manually) \u2014 the skill cannot do this itself, but it must surface the instruction.",
+    "Before closing, the output verifies (via `gh pr view 142 --json state` or similar) that PR #142 is actually in `MERGED` state \u2014 it does NOT close the issue solely on the user's word, since user could be mistaken.",
+    "Any `gh pr list` or `gh pr view` includes the `--state all` flag if listing is involved (so merged PRs remain visible).",
+    "The output does NOT attempt to archive the Conductor workspace itself (Conductor archival is a manual user step), and does NOT delete the worktree directory."
+  ]
+}

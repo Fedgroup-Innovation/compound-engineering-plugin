@@ -1,0 +1,58 @@
+{
+  "expectations": [
+    {
+      "text": "The output names exactly four options in the Phase 4 respond menu, including 'Reply to agent comment', 'Review the PR', 'Mark unit complete', and 'Done for now' \u2014 not six options, no 'Show dependency graph', no 'Dispatch newly unblocked units'.",
+      "passed": false,
+      "evidence": "The output does not present a Phase 4 respond menu at all. It walks through reviewing PR #142 in steps but never enumerates the four menu options ('Reply to agent comment', 'Review the PR', 'Mark unit complete', 'Done for now')."
+    },
+    {
+      "text": "When executing the 'Review the PR' branch, the output uses `gh pr view <number>` (or `--json`) and `gh pr diff <number>` to pull PR state.",
+      "passed": true,
+      "evidence": "Step 2 uses `gh pr view 142` and `gh pr view 142 --json ...`; Step 5 uses `gh pr diff 142`."
+    },
+    {
+      "text": "Any `gh pr list` invocation in the respond loop includes the `--state all` flag (otherwise merged PRs become invisible to the loop).",
+      "passed": true,
+      "evidence": "No `gh pr list` invocation appears in the output, so the constraint is vacuously satisfied."
+    },
+    {
+      "text": "The output routes review work through the existing `/ce-code-review` skill (via the platform's skill-invocation primitive) OR captures user-typed feedback and posts it via `gh pr review` \u2014 it does NOT inline a fresh code-review prompt or invent a new review framework.",
+      "passed": false,
+      "evidence": "The output invents its own review framework (Steps 1\u20138 with a 'review brief' including 'Scope match vs U2 acceptance criteria (\u2705/\u26a0\ufe0f per criterion), CI status, Files changed + LOC, Concerns / questions / suggested change requests, My recommendation'). It does not invoke `/ce-code-review`. It does use `gh pr review` for posting, but the review work itself is done via an inlined ad-hoc framework rather than the existing skill or purely user-typed feedback."
+    },
+    {
+      "text": "The output does NOT mention any auto-review / `dispatch_auto_review` config, dependency-aware merge gating, or auto re-dispatch of newly unblocked units.",
+      "passed": true,
+      "evidence": "No mention of auto-review, dispatch_auto_review, dependency-aware merge gating, or auto re-dispatch appears in the output."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "eval_feedback": {
+    "suggestions": [
+      "Expectation [2] is vacuously satisfied when no `gh pr list` is invoked; consider rephrasing as 'If `gh pr list` is invoked, it includes --state all' vs. requiring the loop to actually list PRs.",
+      "Expectation [0] tests menu structure but the prompt apparently asked the agent to walk through reviewing a specific PR, so the agent skipped re-enumerating the menu. If menu fidelity matters, prompt should explicitly ask for the menu."
+    ],
+    "overall": "Eval is reasonable but some expectations (menu enumeration, pr list flag) depend on prompt framing that may not have elicited them."
+  },
+  "execution_metrics": {
+    "tool_calls": {},
+    "total_tool_calls": 0,
+    "total_steps": 1,
+    "files_created": [
+      "outputs/output.md"
+    ],
+    "errors_encountered": 0,
+    "output_chars": 2968,
+    "transcript_chars": 934
+  },
+  "timing": {
+    "executor_duration_seconds": 15.7,
+    "grader_duration_seconds": 9.98,
+    "total_duration_seconds": 25.68
+  }
+}

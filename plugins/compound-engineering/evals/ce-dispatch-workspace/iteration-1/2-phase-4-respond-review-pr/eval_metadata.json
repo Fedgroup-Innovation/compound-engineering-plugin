@@ -1,0 +1,14 @@
+{
+  "eval_id": 2,
+  "eval_name": "phase-4-respond-review-pr",
+  "prompt": "I'm the orchestrator. The agent in the dispatched workspace at /Users/ryan/conductor/workspaces/api-gateway/jackson just opened PR #142 against the issue we created for unit U2 of the rate-limit plan. Bring me into the dispatch respond loop. I want to review the PR. Walk me through what you would do, in order, including the exact `gh` commands.",
+  "expected_output": "The agent enters Phase 4 respond loop, surfaces the four-option menu, executes the 'Review the PR' branch: pulls PR #142 via `gh pr view --json` (with `--state all` so merged PRs aren't invisible), pulls the diff, and either invokes `/ce-code-review` against the branch or captures user-typed feedback. If feedback, posts it via `gh pr review --comment` or `--request-changes`.",
+  "files": [],
+  "expectations": [
+    "The output names exactly four options in the Phase 4 respond menu, including 'Reply to agent comment', 'Review the PR', 'Mark unit complete', and 'Done for now' \u2014 not six options, no 'Show dependency graph', no 'Dispatch newly unblocked units'.",
+    "When executing the 'Review the PR' branch, the output uses `gh pr view <number>` (or `--json`) and `gh pr diff <number>` to pull PR state.",
+    "Any `gh pr list` invocation in the respond loop includes the `--state all` flag (otherwise merged PRs become invisible to the loop).",
+    "The output routes review work through the existing `/ce-code-review` skill (via the platform's skill-invocation primitive) OR captures user-typed feedback and posts it via `gh pr review` \u2014 it does NOT inline a fresh code-review prompt or invent a new review framework.",
+    "The output does NOT mention any auto-review / `dispatch_auto_review` config, dependency-aware merge gating, or auto re-dispatch of newly unblocked units."
+  ]
+}

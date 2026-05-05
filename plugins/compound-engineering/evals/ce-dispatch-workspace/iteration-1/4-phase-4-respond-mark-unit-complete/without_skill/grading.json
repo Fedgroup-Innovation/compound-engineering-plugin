@@ -1,0 +1,57 @@
+{
+  "expectations": [
+    {
+      "text": "The output uses `gh issue close 87` (or `gh issue close <num> --comment <closeout>`) to close the dispatched issue.",
+      "passed": true,
+      "evidence": "`gh issue close 87 --reason completed` in step 2"
+    },
+    {
+      "text": "The output explicitly tells the user to archive the Conductor workspace at the worktree path (or remove it manually) \u2014 the skill cannot do this itself, but it must surface the instruction.",
+      "passed": false,
+      "evidence": "No mention of Conductor workspace archival or worktree cleanup anywhere in the output."
+    },
+    {
+      "text": "Before closing, the output verifies (via `gh pr view 142 --json state` or similar) that PR #142 is actually in `MERGED` state \u2014 it does NOT close the issue solely on the user's word, since user could be mistaken.",
+      "passed": false,
+      "evidence": "Verification step `gh pr view 142 --json state,mergedAt,...` appears in step 4, AFTER the close command in step 2. The close is not gated on verified merge state."
+    },
+    {
+      "text": "Any `gh pr list` or `gh pr view` includes the `--state all` flag if listing is involved (so merged PRs remain visible).",
+      "passed": false,
+      "evidence": "`gh pr view 142 --json state,mergedAt,mergeCommit,baseRefName` has no `--state all` flag. (Note: `pr view` by number doesn't strictly require it, but expectation says any pr view/list should include it.)"
+    },
+    {
+      "text": "The output does NOT attempt to archive the Conductor workspace itself (Conductor archival is a manual user step), and does NOT delete the worktree directory.",
+      "passed": true,
+      "evidence": "No rm, git worktree remove, or conductor archive commands appear in the output."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 3,
+    "total": 5,
+    "pass_rate": 0.4
+  },
+  "eval_feedback": {
+    "suggestions": [
+      "Expectation [3] is ambiguous when only `gh pr view <num>` is used \u2014 `--state all` is only meaningful for `gh pr list`. Consider scoping it to list operations only."
+    ],
+    "overall": "Expectations are reasonable; the Conductor-archive instruction and verify-before-close ordering are the key discriminators."
+  },
+  "execution_metrics": {
+    "tool_calls": {},
+    "total_tool_calls": 0,
+    "total_steps": 1,
+    "files_created": [
+      "outputs/output.md"
+    ],
+    "errors_encountered": 0,
+    "output_chars": 1781,
+    "transcript_chars": 784
+  },
+  "timing": {
+    "executor_duration_seconds": 9.43,
+    "grader_duration_seconds": 8.3,
+    "total_duration_seconds": 17.73
+  }
+}

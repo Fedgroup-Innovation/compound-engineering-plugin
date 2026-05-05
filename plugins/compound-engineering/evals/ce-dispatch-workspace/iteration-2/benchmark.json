@@ -1,0 +1,153 @@
+{
+  "metadata": {
+    "skill_name": "ce-dispatch",
+    "skill_path": "/home/ubuntu/repos/compound-engineering-plugin/plugins/compound-engineering/skills/ce-dispatch",
+    "executor_model": "anthropic/claude-opus-4.7",
+    "analyzer_model": "anthropic/claude-opus-4.7",
+    "timestamp": "2026-05-05T10:01:43Z",
+    "evals_run": [
+      2
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 2,
+      "eval_name": "2-phase-4-respond-review-pr",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 27.09,
+        "tokens": 14145,
+        "tool_calls": 0,
+        "errors": 0,
+        "cost_usd": 0.11031075
+      },
+      "expectations": [
+        {
+          "text": "The output names exactly four options in the Phase 4 respond menu, including 'Reply to agent comment', 'Review the PR', 'Mark unit complete', and 'Done for now' \u2014 not six options, no 'Show dependency graph', no 'Dispatch newly unblocked units'.",
+          "passed": true,
+          "evidence": "Step 2 lists exactly: '1. Reply to agent comment / 2. Review the PR / 3. Mark unit complete / 4. Done for now' with no extra options."
+        },
+        {
+          "text": "When executing the 'Review the PR' branch, the output uses `gh pr view <number>` (or `--json`) to pull PR state. If the agent inspects the diff itself rather than delegating to `/ce-code-review`, it must also run `gh pr diff <number>`; if it delegates to `/ce-code-review`, that sub-skill is expected to handle diff fetching and a direct `gh pr diff` invocation is optional.",
+          "passed": true,
+          "evidence": "'gh pr view 142 --json number,url,state,merged,...' is used, and review is delegated to ce-code-review skill ('I invoke the `ce-code-review` skill ... ce-code-review owns the review itself'), making gh pr diff optional."
+        },
+        {
+          "text": "Any `gh pr list` invocation in the respond loop includes the `--state all` flag (otherwise merged PRs become invisible to the loop).",
+          "passed": true,
+          "evidence": "No `gh pr list` is invoked in the loop; only `gh pr view 142` is used (with a comment noting '--state all in case it was already merged'). Vacuously satisfied."
+        },
+        {
+          "text": "The output routes review work through the existing `/ce-code-review` skill (via the platform's skill-invocation primitive) OR captures user-typed feedback and posts it via `gh pr review` \u2014 it does NOT inline a fresh code-review prompt or invent a new review framework.",
+          "passed": true,
+          "evidence": "'I invoke the `ce-code-review` skill via the platform's skill-invocation primitive (`Skill` in Claude Code)' and 'gh pr review 142 --comment --body-file' for typed feedback."
+        },
+        {
+          "text": "The output does NOT mention any auto-review / `dispatch_auto_review` config, dependency-aware merge gating, or auto re-dispatch of newly unblocked units.",
+          "passed": true,
+          "evidence": "No mention of dispatch_auto_review, dependency graph, merge gating, or auto re-dispatch found anywhere in the output."
+        }
+      ],
+      "notes": "Expectations are clear and well-targeted at the common failure modes; the output cleanly satisfied all of them."
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "2-phase-4-respond-review-pr",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 14.36,
+        "tokens": 1424,
+        "tool_calls": 0,
+        "errors": 0,
+        "cost_usd": 0.0292644
+      },
+      "expectations": [
+        {
+          "text": "The output names exactly four options in the Phase 4 respond menu, including 'Reply to agent comment', 'Review the PR', 'Mark unit complete', and 'Done for now' \u2014 not six options, no 'Show dependency graph', no 'Dispatch newly unblocked units'.",
+          "passed": false,
+          "evidence": "The output does not present a Phase 4 respond menu at all. It describes a PR review procedure with steps, and offers verdict options (Approve + merge, Request changes, Comment only) rather than the required four menu options ('Reply to agent comment', 'Review the PR', 'Mark unit complete', 'Done for now')."
+        },
+        {
+          "text": "When executing the 'Review the PR' branch, the output uses `gh pr view <number>` (or `--json`) to pull PR state. If the agent inspects the diff itself rather than delegating to `/ce-code-review`, it must also run `gh pr diff <number>`; if it delegates to `/ce-code-review`, that sub-skill is expected to handle diff fetching and a direct `gh pr diff` invocation is optional.",
+          "passed": true,
+          "evidence": "`gh pr view 142 --json number,title,...` and `gh pr diff 142` are both invoked; the agent inspects the diff itself and correctly runs both commands."
+        },
+        {
+          "text": "Any `gh pr list` invocation in the respond loop includes the `--state all` flag (otherwise merged PRs become invisible to the loop).",
+          "passed": true,
+          "evidence": "No `gh pr list` is invoked in the output, so this vacuously holds (no violating invocation exists)."
+        },
+        {
+          "text": "The output routes review work through the existing `/ce-code-review` skill (via the platform's skill-invocation primitive) OR captures user-typed feedback and posts it via `gh pr review` \u2014 it does NOT inline a fresh code-review prompt or invent a new review framework.",
+          "passed": true,
+          "evidence": "\"Request changes \u2192 I run `gh pr review 142 --request-changes --body \"<your feedback>\"`\" \u2014 captures user feedback and posts via `gh pr review`; no new review framework is invented."
+        },
+        {
+          "text": "The output does NOT mention any auto-review / `dispatch_auto_review` config, dependency-aware merge gating, or auto re-dispatch of newly unblocked units.",
+          "passed": true,
+          "evidence": "No mention of auto-review, dispatch_auto_review, dependency-aware merge gating, or auto re-dispatch appears in the output."
+        }
+      ],
+      "notes": "Expectations are reasonable but [0] depends on menu exposition that the prompt may not have elicited; [2] is vacuous for outputs that skip pr list."
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 27.09,
+        "stddev": 0.0,
+        "min": 27.09,
+        "max": 27.09
+      },
+      "tokens": {
+        "mean": 14145.0,
+        "stddev": 0.0,
+        "min": 14145.0,
+        "max": 14145.0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.8,
+        "stddev": 0.0,
+        "min": 0.8,
+        "max": 0.8
+      },
+      "time_seconds": {
+        "mean": 14.36,
+        "stddev": 0.0,
+        "min": 14.36,
+        "max": 14.36
+      },
+      "tokens": {
+        "mean": 1424.0,
+        "stddev": 0.0,
+        "min": 1424.0,
+        "max": 1424.0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.2",
+      "time_seconds": "+12.73",
+      "tokens": "+12721.0"
+    }
+  },
+  "notes": []
+}

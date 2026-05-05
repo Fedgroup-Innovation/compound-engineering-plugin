@@ -1,0 +1,55 @@
+{
+  "expectations": [
+    {
+      "text": "The output uses `gh issue view 87 --comments` (or `gh api` equivalent) to pull the issue comment thread before composing a reply.",
+      "passed": true,
+      "evidence": "`gh issue view 87 --json comments,body --jq '.comments[-3:]'` used before composing reply"
+    },
+    {
+      "text": "The output's reply body starts with the literal pattern `[orchestrator -> jackson]` followed by an ISO 8601 UTC timestamp (e.g., `2026-05-04T12:34:00Z`) \u2014 matching the comment-protocol section in the dispatched prompt template.",
+      "passed": true,
+      "evidence": "`**[orchestrator -> jackson] 2025-01-20T18:42:00Z**` at start of reply body"
+    },
+    {
+      "text": "The output uses `gh issue comment 87` (with `--body` or `--body-file`) to post the reply, NOT `gh pr comment` (the issue is the surface, not the PR).",
+      "passed": true,
+      "evidence": "`gh issue comment 87 --body-file \"$SCRATCH/reply.md\"`"
+    },
+    {
+      "text": "The reply body explicitly states the decision (use standalone Redis) and a brief rationale (already in stack, no cluster), reflecting the orchestrator's input \u2014 it does NOT just paraphrase the agent's question without answering.",
+      "passed": true,
+      "evidence": "'Use **standalone Redis**. Do not introduce Redis Cluster mode' + rationale 'We already run a standalone Redis in this stack'"
+    },
+    {
+      "text": "The output does NOT modify the issue body itself or the metadata footer; comments are append-only per the protocol.",
+      "passed": true,
+      "evidence": "Only `gh issue comment` is used; no edit of issue body or footer"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "eval_feedback": {
+    "suggestions": [],
+    "overall": "Expectations are well-scoped and verifiable from the transcript."
+  },
+  "execution_metrics": {
+    "tool_calls": {},
+    "total_tool_calls": 0,
+    "total_steps": 1,
+    "files_created": [
+      "outputs/output.md"
+    ],
+    "errors_encountered": 0,
+    "output_chars": 2922,
+    "transcript_chars": 33519
+  },
+  "timing": {
+    "executor_duration_seconds": 15.34,
+    "grader_duration_seconds": 7.99,
+    "total_duration_seconds": 23.33
+  }
+}

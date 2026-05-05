@@ -1,0 +1,57 @@
+{
+  "expectations": [
+    {
+      "text": "The output uses `gh issue view 87 --comments` (or `gh api` equivalent) to pull the issue comment thread before composing a reply.",
+      "passed": false,
+      "evidence": "No `gh issue view 87 --comments` or equivalent `gh api` call appears in the output; the agent proceeds directly to composing a comment without fetching the thread."
+    },
+    {
+      "text": "The output's reply body starts with the literal pattern `[orchestrator -> jackson]` followed by an ISO 8601 UTC timestamp (e.g., `2026-05-04T12:34:00Z`) \u2014 matching the comment-protocol section in the dispatched prompt template.",
+      "passed": false,
+      "evidence": "Reply body begins with 'Decision: **Use standalone Redis**...'; no `[orchestrator -> jackson]` prefix or ISO 8601 timestamp is present."
+    },
+    {
+      "text": "The output uses `gh issue comment 87` (with `--body` or `--body-file`) to post the reply, NOT `gh pr comment` (the issue is the surface, not the PR).",
+      "passed": true,
+      "evidence": "`gh issue comment 87 --body \"$(cat <<'EOF' ... EOF\n)\"`"
+    },
+    {
+      "text": "The reply body explicitly states the decision (use standalone Redis) and a brief rationale (already in stack, no cluster), reflecting the orchestrator's input \u2014 it does NOT just paraphrase the agent's question without answering.",
+      "passed": true,
+      "evidence": "'Decision: **Use standalone Redis**' and rationale 'We already run a standalone Redis in this stack; reuse it rather than introducing new infrastructure.' plus notes on avoiding cluster mode."
+    },
+    {
+      "text": "The output does NOT modify the issue body itself or the metadata footer; comments are append-only per the protocol.",
+      "passed": true,
+      "evidence": "Only `gh issue comment` is used; no `gh issue edit` or body modification is performed."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "eval_feedback": {
+    "suggestions": [
+      "Expectation [0] (fetching comments first) and [1] (protocol prefix/timestamp) rely on information that should be in the dispatched prompt template. If that context isn't supplied in the eval prompt, the agent has no way to know about the `[orchestrator -> jackson]` convention \u2014 consider including the protocol snippet explicitly in the eval setup."
+    ],
+    "overall": "Reasonable expectations, but [1] in particular requires the protocol template to be in-context; ensure the eval prompt includes it or adjust scoring."
+  },
+  "execution_metrics": {
+    "tool_calls": {},
+    "total_tool_calls": 0,
+    "total_steps": 1,
+    "files_created": [
+      "outputs/output.md"
+    ],
+    "errors_encountered": 0,
+    "output_chars": 2469,
+    "transcript_chars": 1102
+  },
+  "timing": {
+    "executor_duration_seconds": 11.01,
+    "grader_duration_seconds": 8.38,
+    "total_duration_seconds": 19.39
+  }
+}
